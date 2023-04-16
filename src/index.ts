@@ -108,9 +108,7 @@ const log = debug('contract-compiller');
       .map(
         (contract, i) =>
           `import * as _${i} from './${_.camelCase(contract.name)}';\n` +
-          `export const ${_.upperFirst(
-            _.camelCase(contract.name),
-          )} = { ..._${i} };\n`,
+          `export const ${_.upperFirst(_.camelCase(contract.name))} = _${i};\n`,
       )
       .join(`\n`),
   );
