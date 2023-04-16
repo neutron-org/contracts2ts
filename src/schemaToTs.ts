@@ -78,6 +78,13 @@ import { StdFee } from "@cosmjs/amino";
   }
 
   out += `
+
+function isSigningCosmWasmClient(
+  client: CosmWasmClient | SigningCosmWasmClient
+): client is SigningCosmWasmClient {
+  return 'execute' in client;
+}
+
 export class Client {
   private readonly client: CosmWasmClient | SigningCosmWasmClient;
   contractAddress: string;
@@ -145,8 +152,8 @@ export class Client {
     for (const execute of file.execute.oneOf) {
       const executeName = execute.required[0];
       const inType = execute.properties[executeName];
-
-      if (inType.required) {
+      log('generating execute', executeName, inType);
+      if (inType.properties) {
         wasRequired = true;
         const compType = {
           ...inType,
@@ -158,7 +165,7 @@ export class Client {
         )} = async(sender:string, args: ${_.upperFirst(
           _.camelCase(executeName),
         )}Args, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> =>  {
-    if (!(this.client instanceof SigningCosmWasmClient)) { throw this.mustBeSigningClient(); }
+          if (!isSigningCosmWasmClient(this.client)) { throw this.mustBeSigningClient(); }
     return this.client.execute(sender, this.contractAddress, { ${executeName}: args }, fee || "auto", memo, funds);
   }
 `;
@@ -166,7 +173,7 @@ export class Client {
         out += `  ${_.camelCase(
           executeName,
         )} = async(sender: string, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> =>  {
-    if (!(this.client instanceof SigningCosmWasmClient)) { throw this.mustBeSigningClient(); }
+          if (!isSigningCosmWasmClient(this.client)) { throw this.mustBeSigningClient(); }
     return this.client.execute(sender, this.contractAddress, { ${executeName}: {} }, fee || "auto", memo, funds);
   }
 `;
