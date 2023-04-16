@@ -3,7 +3,7 @@
     "target": "ESNext",
     "types": ["node"],
     "module": "commonjs",
-    "lib": ["esnext"],
+    "lib": ["esnext","DOM"],
     "outDir": "lib",
     "resolveJsonModule": true,
     "esModuleInterop": true

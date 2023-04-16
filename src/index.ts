@@ -1,40 +1,58 @@
 #!/usr/bin/env node
 
-import codegen from '@cosmwasm/ts-codegen';
-import { cliArguments } from 'cli-argument-parser';
 import { promises as fs } from 'fs';
 import { exec } from 'child_process';
 import getFiles from 'node-recursive-directory';
 import path from 'path';
+import { schemaToTs } from './schemaToTs';
+import _ from 'lodash';
+import yargs from 'yargs/yargs';
+import { hideBin } from 'yargs/helpers';
+import debug from 'debug';
+const log = debug('contract-compiller');
 
 (async () => {
-  const contractPath = cliArguments.src;
-  if (Object.keys(cliArguments).length !== 3) {
-    console.log(
-      'Usage: contracts2ts --src <path to contracts> --out <path to output> --scope <scope>',
-    );
-    process.exit(0);
-  }
-  if (!contractPath) {
-    throw new Error('Contract path is not defined');
-  }
-  const outputDir = cliArguments.out;
-  if (!outputDir) {
-    throw new Error('Output path is not defined');
-  }
-  const scope = cliArguments.scope;
-  if (!scope) {
-    throw new Error('Scope is not defined');
-  }
-  const buildSchema = cliArguments.buildSchema === 'false' ? false : true;
+  const argv = await yargs(hideBin(process.argv))
+    .option('src', {
+      type: 'string',
+      description: 'Path to contracts project',
+      require: true,
+    })
+    .option('out', {
+      type: 'string',
+      description: 'Path to output',
+      require: true,
+    })
+    .option('buildSchema', {
+      type: 'boolean',
+      description: 'Build schema before codegen',
+      default: false,
+    })
+    .parse();
+  log('argv', argv);
+  const contractPath = argv.src;
+  const outputDir = argv.out;
+  const buildSchema = argv.buildSchema;
   const dir = path.join(process.cwd(), contractPath, '/contracts');
   const files = (await getFiles(dir)).filter((file) =>
     file.endsWith('Cargo.toml'),
   );
-  const contracts: { dir: string; name: string }[] = files.map((file) => ({
-    dir: path.dirname(file),
-    name: path.basename(path.dirname(file)),
-  }));
+  const contracts: { dir: string; name: string }[] = await Promise.all(
+    files.map(async (file) => {
+      const dir = path.dirname(file);
+      const name = await fs.readFile(file, 'utf8').then((data) => {
+        const name = data.match(/name = "(.*)"/);
+        if (name) {
+          return name[1];
+        }
+        return '';
+      });
+      return {
+        name,
+        dir: dir,
+      };
+    }),
+  );
   if (buildSchema) {
     for (const contract of contracts) {
       await new Promise((r, rj) =>
@@ -51,39 +69,50 @@ import path from 'path';
       );
     }
   }
-  const contractsForCodegen = await Promise.all(
-    contracts.map(async (contract) => {
-      //check if schema exists
-      const schemaPath = path.join(contract.dir, '/schema/raw');
-      const schemaExists = await fs
-        .access(schemaPath)
-        .then(() => true)
-        .catch(() => false);
-      return {
-        name: contract.name,
-        dir: schemaExists ? schemaPath : path.join(contract.dir, '/schema'),
-      };
+  const contractsForCodegen = (
+    await Promise.all(
+      contracts.map(async (contract) => {
+        //check if schema exists
+        const schemaPath = path.join(
+          contract.dir,
+          `/schema/${contract.name}.json`,
+        );
+        const schemaExists = await fs
+          .access(schemaPath)
+          .then(() => true)
+          .catch(() => false);
+        return (
+          schemaExists && {
+            name: contract.name,
+            filePath: schemaPath,
+          }
+        );
+      }),
+    )
+  ).filter(Boolean);
+
+  await fs.mkdir(outputDir, { recursive: true });
+  await Promise.all(
+    contractsForCodegen.map(async (contract) => {
+      try {
+        await schemaToTs(contract.filePath, contract.name, outputDir);
+      } catch (e) {
+        console.error(`Error while processing ${contract.name}: ${e}`);
+        console.error(e.stack);
+      }
     }),
   );
-
-  await codegen({
-    contracts: contractsForCodegen,
-    outPath: path.join(process.cwd(), outputDir),
-    options: {
-      bundle: {
-        bundleFile: 'index.ts',
-        scope,
-      },
-      types: {
-        enabled: true,
-      },
-      client: {
-        enabled: true,
-      },
-      messageComposer: {
-        enabled: false,
-      },
-    },
-  });
-  console.log('Done');
+  await fs.writeFile(
+    path.join(outputDir, 'index.ts'),
+    contractsForCodegen
+      .map(
+        (contract, i) =>
+          `import * as _${i} from './${_.camelCase(contract.name)}';\n` +
+          `export const ${_.upperFirst(
+            _.camelCase(contract.name),
+          )} = { ..._${i} };\n`,
+      )
+      .join(`\n`),
+  );
+  console.log('🎉 Done!');
 })();

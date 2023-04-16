@@ -29,7 +29,7 @@
   },
   "overrides": [
     {
-      "files": ["*.test.ts", "*.test.tsx"],
+      "files": ["*.ts", "*.tsx"],
       "rules": {
         "@typescript-eslint/no-explicit-any": "off"
       }

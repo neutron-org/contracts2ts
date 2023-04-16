@@ -2,6 +2,10 @@
 
 Contracts2TS is a command line tool that helps you generate TypeScript code for CosmWasm smart contracts from their Rust source code. The generated code includes TypeScript types, clients, and other utilities to interact with the smart contracts.
 
+### Important Note
+
+Make sure you have your schemas generated with write_api marcos
+
 ## Installation
 
 You can install Contracts2TS globally using npm:
@@ -23,7 +27,7 @@ contracts2ts --src=<path to contracts> --out=<path to output> --scope=<scope>
 If you don't want to install the package globally, you can use `npx` to run the command:
 
 ```
-npx @neutron-org/contracts2ts --src=<path to contracts> --out=<path to output> --scope=<scope>
+npx @neutron-org/contracts2ts --src <path to contracts> --out <path to output>
 ```
 
 ### Arguments
