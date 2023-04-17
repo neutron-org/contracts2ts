@@ -19,7 +19,7 @@ npm install -g @neutron-org/contracts2ts
 To generate TypeScript code for your smart contracts, run the following command:
 
 ```
-contracts2ts --src=<path to contracts> --out=<path to output> --scope=<scope>
+contracts2ts --src=<path to contracts> --out=<path to output>
 ```
 
 ### NPX Usage
@@ -34,15 +34,14 @@ npx @neutron-org/contracts2ts --src <path to contracts> --out <path to output>
 
 - `--src`: The path to the contracts directory.
 - `--out`: The path to the output directory where the generated TypeScript code will be saved.
-- `--scope`: The scope for the generated TypeScript code.
 
 ### Example
 
 ```
-contracts2ts --src=./neutron-dao --out=./dao.ts --scope=tge
+contracts2ts --src=./neutron-dao --out=./dao.ts
 ```
 
-This command will generate TypeScript code for the smart contracts located in the `./neutron-dao` directory and save the output in the `./dao.ts` directory with the scope `tge`.
+This command will generate TypeScript code for the smart contracts located in the `./neutron-dao` directory and save the output in the `./dao.ts` directory.
 
 ## How it works
 
