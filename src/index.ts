@@ -1,34 +1,24 @@
-#!/usr/bin/env node
-
 import { promises as fs } from 'fs';
 import { exec } from 'child_process';
 import getFiles from 'node-recursive-directory';
 import path from 'path';
 import { schemaToTs } from './schemaToTs';
 import _ from 'lodash';
-import yargs from 'yargs/yargs';
-import { hideBin } from 'yargs/helpers';
+import { Command } from 'commander';
 import debug from 'debug';
-const log = debug('contract-compiller');
+const log = debug('contract-compiler');
+
+const program = new Command();
+program
+  .requiredOption('-s, --src <path>', 'Path to contracts project')
+  .requiredOption('-o, --out <path>', 'Path to output')
+  .option('-b, --buildSchema', 'Build schema before codegen', false);
+
+program.parse();
+
+const argv = program.opts();
 
 (async () => {
-  const argv = await yargs(hideBin(process.argv))
-    .option('src', {
-      type: 'string',
-      description: 'Path to contracts project',
-      require: true,
-    })
-    .option('out', {
-      type: 'string',
-      description: 'Path to output',
-      require: true,
-    })
-    .option('buildSchema', {
-      type: 'boolean',
-      description: 'Build schema before codegen',
-      default: false,
-    })
-    .parse();
   log('argv', argv);
   const contractPath = argv.src;
   const outputDir = argv.out;
