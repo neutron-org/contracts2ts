@@ -101,7 +101,7 @@ const generate = async (argv: Args) => {
   console.log('🎉 Done!');
 };
 
-if (require.main !== module) {
+if (require.main === module) {
   const program = new Command();
   program
     .requiredOption('-s, --src <path>', 'Path to contracts project')
