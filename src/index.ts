@@ -8,17 +8,13 @@ import { Command } from 'commander';
 import debug from 'debug';
 const log = debug('contract-compiler');
 
-const program = new Command();
-program
-  .requiredOption('-s, --src <path>', 'Path to contracts project')
-  .requiredOption('-o, --out <path>', 'Path to output')
-  .option('-b, --buildSchema', 'Build schema before codegen', false);
+type Args = {
+  src: string;
+  out: string;
+  buildSchema: boolean;
+};
 
-program.parse();
-
-const argv = program.opts();
-
-(async () => {
+const generate = async (argv: Args) => {
   log('argv', argv);
   const contractPath = argv.src;
   const outputDir = argv.out;
@@ -103,4 +99,18 @@ const argv = program.opts();
       .join(`\n`),
   );
   console.log('🎉 Done!');
-})();
+};
+
+if (require.main !== module) {
+  const program = new Command();
+  program
+    .requiredOption('-s, --src <path>', 'Path to contracts project')
+    .requiredOption('-o, --out <path>', 'Path to output')
+    .option('-b, --buildSchema', 'Build schema before codegen', false);
+
+  program.parse();
+
+  const argv = program.opts<Args>();
+  generate(argv);
+}
+export { generate };
