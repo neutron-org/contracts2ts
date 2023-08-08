@@ -31,7 +31,7 @@ export const schemaToTs = async (
 ) => {
   log('schemaToTs', filePath, scope, outDir);
   const file = JSON.parse(await fs.readFile(filePath, 'utf-8'));
-  let importOut = `import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult } from "@cosmjs/cosmwasm-stargate"; 
+  let importOut = `import { CosmWasmClient, SigningCosmWasmClient, ExecuteResult, InstantiateResult } from "@cosmjs/cosmwasm-stargate"; 
 import { StdFee } from "@cosmjs/amino";
 `;
   let out = ``;
@@ -94,6 +94,20 @@ export class Client {
   }
   mustBeSigningClient() {
     return new Error("This client is not a SigningCosmWasmClient");
+  }
+  static async instantiate(
+    client: SigningCosmWasmClient,
+    sender: string,
+    codeId: number,
+    initMsg: InstantiateMsg,
+    label: string,
+    initCoins?: readonly Coin[],
+    fees?: StdFee | 'auto' | number,
+  ): Promise<InstantiateResult> {
+    const res = await client.instantiate(sender, codeId, initMsg, label, fees, {
+      ...(initCoins && initCoins.length && { funds: initCoins }),
+    });
+    return res;
   }
 `;
 
@@ -184,6 +198,17 @@ export class Client {
     } else {
       (globalSchema.required as string[]).push('execute');
     }
+  }
+  log('execute compiled');
+  if (file.instantiate) {
+    log('adding instantiate msg type');
+    typesOut += await compile(
+      (await $RefParser.dereference(file.instantiate)) as JSONSchema4,
+      'InitMsg',
+      {
+        bannerComment: '',
+      },
+    );
   }
 
   out += `}
