@@ -56,10 +56,8 @@ import { StdFee } from "@cosmjs/amino";
     for (const [fnName, value] of Object.entries(file.responses)) {
       const title = (value as any).title;
       const newTitle = _.upperFirst(
-        (title.startsWith('Array_of_')
-          ? title.replace(/^Array_of_/, '') + '[]'
-          : title
-        )
+        title
+          .replace(/Array_of_/, 'ArrayOf')
           .replace(/Tuple_of/, 'TupleOf')
           .replace(/_and_/, 'And_'),
       );
@@ -213,7 +211,6 @@ export class Client {
 
   out += `}
 `;
-
   globalSchema.definitions = fixEmptyEnums(definitions);
   if (!hasCoin && !globalSchema.definitions.Coin) {
     importOut += `import { Coin } from "@cosmjs/amino";
