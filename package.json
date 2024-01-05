@@ -19,7 +19,7 @@
     "@apidevtools/json-schema-ref-parser": "^10.1.0",
     "@cosmjs/launchpad": "^0.27.1",
     "@cosmjs/proto-signing": "^0.30.1",
-    "@cosmjs/tendermint-rpc": "^0.30.1",
+    "@cosmjs/tendermint-rpc": "^0.32.0",
     "@types/yargs": "^17.0.24",
     "commander": "^11.0.0",
     "cosmjs-types": "^0.7.2",
