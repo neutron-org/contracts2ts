@@ -99,8 +99,8 @@ export class Client {
     codeId: number,
     initMsg: InstantiateMsg,
     label: string,
+    fees: StdFee | 'auto' | number,
     initCoins?: readonly Coin[],
-    fees?: StdFee | 'auto' | number,
   ): Promise<InstantiateResult> {
     const res = await client.instantiate(sender, codeId, initMsg, label, fees, {
       ...(initCoins && initCoins.length && { funds: initCoins }),
@@ -118,7 +118,10 @@ export class Client {
     let wasRequired = false;
     for (const query of file.query.oneOf) {
       const queryName = query.required ? query.required[0] : query.enum[0];
-      const outType = queryMap[queryName];
+      const outType = queryMap[queryName]
+        .replace('_for_', 'For_')
+        .replace('_of_', 'Of_')
+        .replace('_and_', 'And_');
       const inType = query.properties && query.properties[queryName];
       log('generating query', queryName);
       if (inType && inType.properties) {
@@ -203,14 +206,8 @@ export class Client {
   }
   log('execute compiled');
   if (file.instantiate) {
-    log('adding instantiate msg type');
-    typesOut += await compile(
-      (await $RefParser.dereference(file.instantiate)) as JSONSchema4,
-      'InitMsg',
-      {
-        bannerComment: '',
-      },
-    );
+    globalSchema.properties.instantiate = file.instantiate;
+    definitions = { ...definitions, ...file.instantiate.definitions };
   }
 
   out += `}
