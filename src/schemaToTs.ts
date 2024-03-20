@@ -99,8 +99,8 @@ export class Client {
     codeId: number,
     initMsg: InstantiateMsg,
     label: string,
+    fees: StdFee | 'auto' | number,
     initCoins?: readonly Coin[],
-    fees?: StdFee | 'auto' | number,
   ): Promise<InstantiateResult> {
     const res = await client.instantiate(sender, codeId, initMsg, label, fees, {
       ...(initCoins && initCoins.length && { funds: initCoins }),
@@ -204,13 +204,7 @@ export class Client {
   log('execute compiled');
   if (file.instantiate) {
     log('adding instantiate msg type');
-    typesOut += await compile(
-      (await $RefParser.dereference(file.instantiate)) as JSONSchema4,
-      'InitMsg',
-      {
-        bannerComment: '',
-      },
-    );
+    globalSchema.properties.instantiate = file.instantiate;
   }
 
   out += `}
