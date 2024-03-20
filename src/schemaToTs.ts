@@ -118,7 +118,10 @@ export class Client {
     let wasRequired = false;
     for (const query of file.query.oneOf) {
       const queryName = query.required ? query.required[0] : query.enum[0];
-      const outType = queryMap[queryName].replace(/_for_/, 'For_');
+      const outType = queryMap[queryName]
+        .replace('_for_', 'For_')
+        .replace('_of_', 'Of_')
+        .replace('_and_', 'And_');
       const inType = query.properties && query.properties[queryName];
       log('generating query', queryName);
       if (inType && inType.properties) {
