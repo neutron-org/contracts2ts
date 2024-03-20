@@ -18,7 +18,7 @@ const fixEnum = (o: JSONSchema4) => {
 };
 
 const fixEmptyEnums = (o: KVJsonSchema) => {
-  for (const [k, dVal] of Object.entries(o)) {
+  for (const [, dVal] of Object.entries(o)) {
     fixEnum(dVal);
   }
   return o;
@@ -117,11 +117,11 @@ export class Client {
     definitions = { ...definitions, ...(file.query as any).definitions };
     let wasRequired = false;
     for (const query of file.query.oneOf) {
-      const queryName = query.required[0];
+      const queryName = query.required ? query.required[0] : query.enum[0];
       const outType = queryMap[queryName];
-      const inType = query.properties[queryName];
+      const inType = query.properties && query.properties[queryName];
       log('generating query', queryName);
-      if (inType.required) {
+      if (inType && inType.properties) {
         wasRequired = true;
         const compType = {
           ...inType,
@@ -165,6 +165,10 @@ export class Client {
       const executeName = execute.required[0];
       const inType = execute.properties[executeName];
       log('generating execute', executeName, inType);
+      if (inType['$ref']) {
+        inType.properties =
+          file.execute.definitions[inType['$ref'].split('/')[2]];
+      }
       if (inType.properties) {
         wasRequired = true;
         const compType = {
