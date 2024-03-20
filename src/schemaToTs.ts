@@ -203,8 +203,8 @@ export class Client {
   }
   log('execute compiled');
   if (file.instantiate) {
-    log('adding instantiate msg type');
     globalSchema.properties.instantiate = file.instantiate;
+    definitions = { ...definitions, ...file.instantiate.definitions };
   }
 
   out += `}
