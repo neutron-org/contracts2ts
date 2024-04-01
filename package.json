@@ -1,6 +1,6 @@
 {
   "name": "@neutron-org/contracts2ts",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "main": "lib/index.js",
   "license": "MIT",
   "author": "Sergey Ratiashvili <serg.s.r@gmail.com>",
