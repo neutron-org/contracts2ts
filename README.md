@@ -43,6 +43,19 @@ contracts2ts --src=./neutron-dao --out=./dao.ts
 
 This command will generate TypeScript code for the smart contracts located in the `./neutron-dao` directory and save the output in the `./dao.ts` directory.
 
+### Using from a script
+
+You can also use Contracts2TS from a script by importing the `generate` function:
+
+```ts
+import { generate } from '@neutron-org/contracts2ts';
+
+generate({
+  src: '../',
+  out: './src/generated/contractLib',
+});
+```
+
 ## How it works
 
 The script does the following:
