@@ -55,13 +55,9 @@ import { StdFee } from "@cosmjs/amino";
     };
     for (const [fnName, value] of Object.entries(file.responses)) {
       const title = (value as any).title;
-      const newTitle = _.upperFirst(
-        title
-          .replace(/Array_of_/, 'ArrayOf')
-          .replace(/Tuple_of/, 'TupleOf')
-          .replace(/_and_/, 'And_'),
-      );
-      log((value as any).title);
+      log('old title', title);
+      const newTitle = _.upperFirst(_.camelCase(title));
+      log('new title', newTitle);
       fixEnum(value);
       if ((value as any).title === 'Coin') {
         hasCoin = true;
@@ -133,10 +129,7 @@ export class Client {
     let wasRequired = false;
     for (const query of file.query.oneOf) {
       const queryName = query.required ? query.required[0] : query.enum[0];
-      const outType = queryMap[queryName]
-        .replace('_for_', 'For_')
-        .replace('_of_', 'Of_')
-        .replace('_and_', 'And_');
+      const outType = queryMap[queryName];
       const inType = query.properties && query.properties[queryName];
       log('generating query', queryName);
       if (inType && inType.properties) {
