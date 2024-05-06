@@ -19,7 +19,7 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "@apidevtools/json-schema-ref-parser": "^11.5.4",
+    "@apidevtools/json-schema-ref-parser": "^11.5.5",
     "@cosmjs/cosmwasm-stargate": "^0.32.3",
     "@cosmjs/launchpad": "^0.27.1",
     "@cosmjs/proto-signing": "^0.32.2",
