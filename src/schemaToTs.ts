@@ -130,7 +130,7 @@ export class Client {
     for (const query of file.query.oneOf) {
       const queryName = query.required ? query.required[0] : query.enum[0];
       const outType = queryMap[queryName];
-      const inType = query.properties && fixUints(query.properties[queryName]);
+      const inType = query.properties && query.properties[queryName];
       log('generating query', queryName);
       if (inType && inType.properties) {
         wasRequired = true;
@@ -174,7 +174,7 @@ export class Client {
     let wasRequired = false;
     for (const execute of file.execute.oneOf) {
       const executeName = execute.required[0];
-      const inType = fixUints(execute.properties[executeName]);
+      const inType = execute.properties[executeName];
       log('generating execute', executeName, inType);
       if (inType['$ref']) {
         inType.properties =
@@ -219,7 +219,7 @@ export class Client {
     globalSchema.properties.instantiate = file.instantiate;
     definitions = { ...definitions, ...file.instantiate.definitions };
   }
-  globalSchema.definitions = applyToKeys(fixEmptyEnums(definitions));
+  globalSchema.definitions = fixEmptyEnums(definitions);
   if (!hasCoin && !globalSchema.definitions.Coin) {
     importOut += `import { Coin } from "@cosmjs/amino";
 `;
