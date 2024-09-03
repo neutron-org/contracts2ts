@@ -86,7 +86,7 @@ export class Client {
     this.client = client;
     this.contractAddress = contractAddress;
   }
-  mustBeSigningClient() {
+  mustBeSigningClient(): Error {
     return new Error("This client is not a SigningCosmWasmClient");
   }
   static async instantiate(
@@ -193,16 +193,20 @@ export class Client {
           _.camelCase(executeName),
         )}Args, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> =>  {
           if (!isSigningCosmWasmClient(this.client)) { throw this.mustBeSigningClient(); }
-    return this.client.execute(sender, this.contractAddress, { ${executeName}: args }, fee || "auto", memo, funds);
+    return this.client.execute(sender, this.contractAddress, this.${_.camelCase(executeName)}Msg(args), fee || "auto", memo, funds);
   }
+  ${_.camelCase(executeName)}Msg = (args: ${_.upperFirst(
+    _.camelCase(executeName),
+  )}Args): { ${executeName}: ${_.upperFirst(_.camelCase(executeName))}Args } => { return { ${executeName}: args }; }
 `;
       } else {
         out += `  ${_.camelCase(
           executeName,
         )} = async(sender: string, fee?: number | StdFee | "auto", memo?: string, funds?: Coin[]): Promise<ExecuteResult> =>  {
           if (!isSigningCosmWasmClient(this.client)) { throw this.mustBeSigningClient(); }
-    return this.client.execute(sender, this.contractAddress, { ${executeName}: {} }, fee || "auto", memo, funds);
+    return this.client.execute(sender, this.contractAddress, this.${_.camelCase(executeName)}Msg(), fee || "auto", memo, funds);
   }
+  ${_.camelCase(executeName)}Msg = (): { ${executeName}: {} } => { return { ${executeName}: {} } }
 `;
       }
     }
