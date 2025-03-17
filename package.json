@@ -20,10 +20,10 @@
   },
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^11.5.4",
-    "@cosmjs/cosmwasm-stargate": "^0.32.4",
+    "@cosmjs/cosmwasm-stargate": "^0.33.1",
     "@cosmjs/launchpad": "^0.27.1",
     "@cosmjs/proto-signing": "^0.32.4",
-    "@cosmjs/tendermint-rpc": "^0.32.3",
+    "@cosmjs/tendermint-rpc": "^0.33.1",
     "@types/yargs": "^17.0.32",
     "commander": "^12.0.0",
     "cosmjs-types": "0.9.0",
