@@ -20,10 +20,10 @@
   },
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^11.5.4",
-    "@cosmjs/cosmwasm-stargate": "^0.32.4",
+    "@cosmjs/cosmwasm-stargate": "^0.34.0",
     "@cosmjs/launchpad": "^0.27.1",
     "@cosmjs/proto-signing": "^0.32.4",
-    "@cosmjs/tendermint-rpc": "^0.32.3",
+    "@cosmjs/tendermint-rpc": "^0.34.0",
     "@types/yargs": "^17.0.32",
     "commander": "^12.0.0",
     "cosmjs-types": "0.9.0",
@@ -31,7 +31,7 @@
     "express": "^4.18.2",
     "json-schema": "^0.4.0",
     "json-schema-to-typescript": "14.1.0",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "node-recursive-directory": "^1.2.0"
   },
   "devDependencies": {
